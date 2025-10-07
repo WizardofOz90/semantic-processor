@@ -26,28 +26,19 @@ def semantic_add(a: int, b: int) -> str:
     total = a + b
     result = total % 11
     meaning = axioms.get(result, "Unknown")
-    return (
-        f"Math: {a} + {b} = {total}\n"
-        f"Semantic: {total} % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
-    )
+    return f"{a} + {b} = {total} → Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def semantic_subtract(a: int, b: int) -> str:
     difference = a - b
     result = difference % 11
     meaning = axioms.get(result, "Unknown")
-    return (
-        f"Math: {a} - {b} = {difference}\n"
-        f"Semantic: {difference} % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
-    )
+    return f"{a} - {b} = {difference} → Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def semantic_multiply(a: int, b: int) -> str:
     product = a * b
     result = product % 11
     meaning = axioms.get(result, "Unknown")
-    return (
-        f"Math: {a} × {b} = {product}\n"
-        f"Semantic: {product} % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
-    )
+    return f"{a} × {b} = {product} → Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def semantic_divide(a: int, b: int) -> str:
     if b == 0:
@@ -55,10 +46,7 @@ def semantic_divide(a: int, b: int) -> str:
     quotient = a / b
     result = int(quotient) % 11
     meaning = axioms.get(result, "Unknown")
-    return (
-        f"Math: {a} ÷ {b} = {quotient:.2f}\n"
-        f"Semantic: int({quotient:.2f}) % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
-    )
+    return f"{a} ÷ {b} = {quotient:.2f} → Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def compose_idea(path: List[int]) -> str:
     trace = []
@@ -96,21 +84,33 @@ with st.sidebar:
     for i in range(11):
         st.markdown(f"**{i}**: {axiom_colors[i]} {axioms[i]}")
 
-st.header("🔢 Semantic Math Calculator")
-a = st.number_input("Enter first number (a):", value=2, step=1)
-b = st.number_input("Enter second number (b):", value=3, step=1)
+st.header("🧮 Basic + Semantic Calculator")
+st.markdown("Enter two numbers and select an operation. You’ll get both the normal result **and** its semantic axiom.")
 
-if st.button("➕ Add (Semantic)"):
-    st.success(semantic_add(a, b))
+a = st.number_input("First number:", value=1, step=1)
+b = st.number_input("Second number:", value=1, step=1)
+operation = st.selectbox("Choose an operation:", ["+", "-", "×", "÷"])
 
-if st.button("➖ Subtract (Semantic)"):
-    st.success(semantic_subtract(a, b))
-
-if st.button("✖ Multiply (Semantic)"):
-    st.success(semantic_multiply(a, b))
-
-if st.button("➗ Divide (Semantic)"):
-    st.success(semantic_divide(a, b))
+if st.button("Calculate"):
+    if operation == "+":
+        math_result = a + b
+        semantic = semantic_add(a, b)
+    elif operation == "-":
+        math_result = a - b
+        semantic = semantic_subtract(a, b)
+    elif operation == "×":
+        math_result = a * b
+        semantic = semantic_multiply(a, b)
+    elif operation == "÷":
+        if b == 0:
+            math_result = "Undefined"
+            semantic = "Division by zero is undefined."
+        else:
+            math_result = round(a / b, 2)
+            semantic = semantic_divide(a, b)
+    
+    st.success(f"Standard Result: {a} {operation} {b} = {math_result}")
+    st.info(f"{semantic}")
 
 st.markdown("---")
 st.header("📈 Semantic Calculus")
