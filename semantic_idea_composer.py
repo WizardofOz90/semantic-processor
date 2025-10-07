@@ -26,19 +26,28 @@ def semantic_add(a: int, b: int) -> str:
     total = a + b
     result = total % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} + {b} = {total} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return (
+        f"Math: {a} + {b} = {total}\n"
+        f"Semantic: {total} % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    )
 
 def semantic_subtract(a: int, b: int) -> str:
     difference = a - b
     result = difference % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} - {b} = {difference} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return (
+        f"Math: {a} - {b} = {difference}\n"
+        f"Semantic: {difference} % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    )
 
 def semantic_multiply(a: int, b: int) -> str:
     product = a * b
     result = product % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} × {b} = {product} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return (
+        f"Math: {a} × {b} = {product}\n"
+        f"Semantic: {product} % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    )
 
 def semantic_divide(a: int, b: int) -> str:
     if b == 0:
@@ -46,7 +55,18 @@ def semantic_divide(a: int, b: int) -> str:
     quotient = a / b
     result = int(quotient) % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} ÷ {b} = {quotient:.2f} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return (
+        f"Math: {a} ÷ {b} = {quotient:.2f}\n"
+        f"Semantic: int({quotient:.2f}) % 11 = {result} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    )
+
+def compose_idea(path: List[int]) -> str:
+    trace = []
+    for value in path:
+        concept = axioms.get(value % 11, "Unknown")
+        symbol = axiom_colors.get(value % 11, "")
+        trace.append(f"{symbol} {value} → {concept}")
+    return " →→→ ".join(trace)
 
 def semantic_derivative(expr: str, var: str) -> str:
     try:
@@ -66,34 +86,13 @@ def semantic_integral(expr: str, var: str) -> str:
     except Exception as e:
         return f"Error computing integral: {e}"
 
-def compose_idea(path: List[int]) -> str:
-    trace = []
-    for value in path:
-        concept = axioms.get(value % 11, "Unknown")
-        symbol = axiom_colors.get(value % 11, "")
-        trace.append(f"{symbol} {value} → {concept}")
-    return " →→→ ".join(trace)
-
-def semantic_and(a: int, b: int) -> str:
-    result = (a & b) % 11
-    meaning = axioms.get(result, "Unknown")
-    return f"{a} AND {b} = {a & b} → Axiom {result}: {axiom_colors[result]} {meaning}"
-
-def semantic_or(a: int, b: int) -> str:
-    result = (a | b) % 11
-    meaning = axioms.get(result, "Unknown")
-    return f"{a} OR {b} = {a | b} → Axiom {result}: {axiom_colors[result]} {meaning}"
-
-def semantic_not(a: int) -> str:
-    result = (~a) % 11
-    meaning = axioms.get(result, "Unknown")
-    return f"NOT {a} = {~a} → Axiom {result}: {axiom_colors[result]} {meaning}"
-
 # Streamlit UI
 st.set_page_config(page_title="Semantic Processor", layout="centered")
 st.title("🧠 Semantic Processor & Idea Composer")
 
-with st.expander("📘 Axiom Legend"):
+# Sidebar legend
+with st.sidebar:
+    st.subheader("🧬 Axiom Legend")
     for i in range(11):
         st.markdown(f"**{i}**: {axiom_colors[i]} {axioms[i]}")
 
@@ -101,26 +100,17 @@ st.header("🔢 Semantic Math Calculator")
 a = st.number_input("Enter first number (a):", value=2, step=1)
 b = st.number_input("Enter second number (b):", value=3, step=1)
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("➕ Add (Semantic)"):
-        st.success(semantic_add(a, b))
-    if st.button("✖ Multiply (Semantic)"):
-        st.success(semantic_multiply(a, b))
+if st.button("➕ Add (Semantic)"):
+    st.success(semantic_add(a, b))
 
-with col2:
-    if st.button("➖ Subtract (Semantic)"):
-        st.success(semantic_subtract(a, b))
-    if st.button("➗ Divide (Semantic)"):
-        st.success(semantic_divide(a, b))
+if st.button("➖ Subtract (Semantic)"):
+    st.success(semantic_subtract(a, b))
 
-with col3:
-    if st.button("🔀 AND (Logic)"):
-        st.success(semantic_and(a, b))
-    if st.button("🔁 OR (Logic)"):
-        st.success(semantic_or(a, b))
-    if st.button("🚫 NOT (Logic)"):
-        st.success(semantic_not(a))
+if st.button("✖ Multiply (Semantic)"):
+    st.success(semantic_multiply(a, b))
+
+if st.button("➗ Divide (Semantic)"):
+    st.success(semantic_divide(a, b))
 
 st.markdown("---")
 st.header("📈 Semantic Calculus")
@@ -128,13 +118,23 @@ expr_input = st.text_input("Enter a mathematical expression (e.g., x**2 + 3*x):"
 var_input = st.text_input("Differentiate or integrate with respect to (e.g., x):", value="x")
 
 col1, col2 = st.columns(2)
+
 with col1:
     if st.button("🧮 Derivative"):
-        st.info(semantic_derivative(expr_input, var_input))
+        result = semantic_derivative(expr_input, var_input)
+        st.info(result)
 
 with col2:
     if st.button("🔄 Integral"):
-        st.info(semantic_integral(expr_input, var_input))
+        result = semantic_integral(expr_input, var_input)
+        st.info(result)
+
+with st.expander("ℹ️ How It Works"):
+    st.markdown("""
+    - Arithmetic operations use modulo 11 to wrap results into one of the 11 axioms.
+    - Calculus uses symbolic differentiation and integration for expressions with respect to a variable.
+    - This extends the semantic processor to continuous change.
+    """)
 
 st.markdown("---")
 st.header("🌌 Idea Composer")
@@ -158,6 +158,7 @@ if st.button("🧬 Compose Idea"):
     except Exception as e:
         st.error(f"Error: {e}")
 
+# Preset Templates
 st.markdown("---")
 st.subheader("🧠 Try a Semantic Template")
 selected_template = st.selectbox("Choose a Template:", [
