@@ -1,3 +1,4 @@
+
 import streamlit as st
 from typing import List
 import json
@@ -26,19 +27,19 @@ def semantic_add(a: int, b: int) -> str:
     total = a + b
     result = total % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} + {b} = {total} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return f"{a} + {b} = {total}\n→ Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def semantic_subtract(a: int, b: int) -> str:
     difference = a - b
     result = difference % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} - {b} = {difference} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return f"{a} - {b} = {difference}\n→ Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def semantic_multiply(a: int, b: int) -> str:
     product = a * b
     result = product % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} × {b} = {product} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return f"{a} × {b} = {product}\n→ Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def semantic_divide(a: int, b: int) -> str:
     if b == 0:
@@ -46,7 +47,7 @@ def semantic_divide(a: int, b: int) -> str:
     quotient = a / b
     result = int(quotient) % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{a} ÷ {b} = {quotient:.2f} → Axiom {result}: {axiom_colors[result]} {meaning}"
+    return f"{a} ÷ {b} = {quotient:.2f}\n→ Axiom {result}: {axiom_colors[result]} {meaning}"
 
 def compose_idea(path: List[int]) -> str:
     trace = []
@@ -76,7 +77,7 @@ def semantic_integral(expr: str, var: str) -> str:
 
 # Streamlit UI
 st.set_page_config(page_title="Semantic Processor", layout="centered")
-st.title("🧠 Semantic Processor & Idea Composer")
+st.title("🧠 Semantic Processor & Math Interface")
 
 # Sidebar legend
 with st.sidebar:
@@ -84,33 +85,21 @@ with st.sidebar:
     for i in range(11):
         st.markdown(f"**{i}**: {axiom_colors[i]} {axioms[i]}")
 
+# 🔢 Basic Calculator Interface
 st.header("🧮 Basic + Semantic Calculator")
-st.markdown("Enter two numbers and select an operation. You’ll get both the normal result **and** its semantic axiom.")
-
-a = st.number_input("First number:", value=1, step=1)
-b = st.number_input("Second number:", value=1, step=1)
-operation = st.selectbox("Choose an operation:", ["+", "-", "×", "÷"])
+a = st.number_input("First number:", step=1, value=1, key="basic_a")
+b = st.number_input("Second number:", step=1, value=1, key="basic_b")
+operation = st.selectbox("Operation:", ["+", "-", "×", "÷"])
 
 if st.button("Calculate"):
     if operation == "+":
-        math_result = a + b
-        semantic = semantic_add(a, b)
+        st.success(semantic_add(a, b))
     elif operation == "-":
-        math_result = a - b
-        semantic = semantic_subtract(a, b)
+        st.success(semantic_subtract(a, b))
     elif operation == "×":
-        math_result = a * b
-        semantic = semantic_multiply(a, b)
+        st.success(semantic_multiply(a, b))
     elif operation == "÷":
-        if b == 0:
-            math_result = "Undefined"
-            semantic = "Division by zero is undefined."
-        else:
-            math_result = round(a / b, 2)
-            semantic = semantic_divide(a, b)
-    
-    st.success(f"Standard Result: {a} {operation} {b} = {math_result}")
-    st.info(f"{semantic}")
+        st.success(semantic_divide(a, b))
 
 st.markdown("---")
 st.header("📈 Semantic Calculus")
@@ -118,61 +107,20 @@ expr_input = st.text_input("Enter a mathematical expression (e.g., x**2 + 3*x):"
 var_input = st.text_input("Differentiate or integrate with respect to (e.g., x):", value="x")
 
 col1, col2 = st.columns(2)
-
 with col1:
     if st.button("🧮 Derivative"):
-        result = semantic_derivative(expr_input, var_input)
-        st.info(result)
-
+        st.info(semantic_derivative(expr_input, var_input))
 with col2:
     if st.button("🔄 Integral"):
-        result = semantic_integral(expr_input, var_input)
-        st.info(result)
-
-with st.expander("ℹ️ How It Works"):
-    st.markdown("""
-    - Arithmetic operations use modulo 11 to wrap results into one of the 11 axioms.
-    - Calculus uses symbolic differentiation and integration for expressions with respect to a variable.
-    - This extends the semantic processor to continuous change.
-    """)
+        st.info(semantic_integral(expr_input, var_input))
 
 st.markdown("---")
 st.header("🌌 Idea Composer")
-idea_input = st.text_input("Enter a sequence of numbers separated by commas (e.g. 0,1,2,3):")
-
+idea_input = st.text_input("Enter a sequence of numbers (e.g. 0,1,2,3):")
 if st.button("🧬 Compose Idea"):
     try:
         path = [int(x.strip()) for x in idea_input.split(",") if x.strip().isdigit()]
         result = compose_idea(path)
         st.info(result)
-
-        # Export options
-        if st.button("💾 Export as JSON"):
-            json_data = json.dumps({"idea_sequence": path, "semantic_trace": result}, indent=2)
-            st.download_button("Download JSON", json_data, file_name="semantic_idea.json")
-
-        if st.button("📄 Export as Text"):
-            txt_data = result
-            st.download_button("Download Text", txt_data, file_name="semantic_idea.txt")
-
     except Exception as e:
         st.error(f"Error: {e}")
-
-# Preset Templates
-st.markdown("---")
-st.subheader("🧠 Try a Semantic Template")
-selected_template = st.selectbox("Choose a Template:", [
-    "(None)",
-    "Big Bang → 0,1,2,3",
-    "Mind Emergence → 5,6,7,9",
-    "Feedback Loop → 2,4,6,10"
-])
-
-if selected_template != "(None)":
-    template_map = {
-        "Big Bang → 0,1,2,3": [0,1,2,3],
-        "Mind Emergence → 5,6,7,9": [5,6,7,9],
-        "Feedback Loop → 2,4,6,10": [2,4,6,10]
-    }
-    path = template_map[selected_template]
-    st.info(compose_idea(path))
