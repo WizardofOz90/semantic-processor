@@ -79,17 +79,79 @@ def semantic_integral(expr: str, var: str) -> str:
 st.set_page_config(page_title="Semantic Processor", layout="centered")
 st.title("🧠 Semantic Processor & Idea Composer")
 
-# Sidebar legend
+# Sidebar legend - improved for visuals
 with st.sidebar:
     st.subheader("🧬 Axiom Legend")
     for i in range(11):
         st.markdown(f"**{i}**: {axiom_colors[i]} {axioms[i]}")
+        if i == 7:
+            st.markdown("**Visual:**<br>\n"  
+                "&nbsp;&nbsp;🟡&nbsp;&nbsp;&nbsp;&nbsp;🟠  <br>\n"  
+                "🔵&nbsp;&nbsp;&nbsp;🟣&nbsp;&nbsp;&nbsp;🔴<br>\n"  
+                "&nbsp;&nbsp;🟢&nbsp;&nbsp;&nbsp;&nbsp;🟣", unsafe_allow_html=True)
+        else:
+            visuals = [
+                "⚪",           # Void
+                "🔴",           # Monad
+                "🔵 🔴",        # Duality
+                "🟡 🟠 🔵",      # Triad
+                "🟠 🟡 🟢 🔵",   # Pattern
+                "🟢 🟠 🟡 🔵 🔴",# Growth
+                "🟣 🟢 🟡 🟠 🔴 🔵", # Recursion
+                " ",            # Self-awareness (hexagon above)
+                "🔴—🟡—🟠—🟢",   # Interconnection
+                "🔴🟡🟢🟣🟠🔵",    # Unity
+                "⚪ ↻",         # Rebirth
+            ]
+            st.markdown(f"**Visual:** {visuals[i]}")
 
 def axiom_reference_table():
+    visuals = [
+        "⚪🌌",
+        "🔴➖",
+        "🔵↔️",
+        "🟡🔼🔽",
+        "🟠🔁",
+        "🟢🌱",
+        "🟣🔂",
+        "🟤🟣",        # Self-awareness now hexagon magenta
+        "🟥🕸️",
+        "🟦🔗",
+        "⬜🔄",
+    ]
+    descriptions = [
+        "Origin / Potential",
+        "Individual / Distinction",
+        "Opposites / Relationship",
+        "Change / Mediation",
+        "Recurring Pattern",
+        "Growth / Evolution",
+        "Memory / Recursion",
+        "Self-awareness",
+        "Connections / Network",
+        "Unity / Integration",
+        "Renewal / Rebirth"
+    ]
+    dots = [
+        "⚪",                           # Void
+        "  🔴  ",                      # Monad
+        "🔵   🔴",                      # Duality
+        "🟡   🟠\n  🔵  ",              # Triad
+        "🟠   🟡\n🟢   🔵",              # Pattern
+        "🟢   🟠\n  🟡  \n🔵   🔴",      # Growth
+        "🟣 🟢 🟡\n🟠 🔴 🔵",             # Recursion
+        "  🟡   🟠\n🔵   🟣   🔴\n  🟢   🟣", # Self-awareness (hexagon, center magenta)
+        "🔴—🟡—🟠—🟢",                   # Interconnection
+        "🔴🟡🟢\n🟣🟠🔵\n⚪⚫⬜",             # Unity
+        "  ⚪  \n↻",                    # Rebirth
+    ]
+
     table_data = {
-        "Axiom #": [i for i in range(11)],
         "Symbol": [axiom_colors[i] for i in range(11)],
-        "Meaning": [axioms[i] for i in range(11)],
+        "Visual": visuals,
+        "Dots (Dice)": dots,
+        "Human Description": descriptions,
+        "Axiom Name": [axioms[i] for i in range(11)],
     }
     df = pd.DataFrame(table_data)
     st.dataframe(df, use_container_width=True)
