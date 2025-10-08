@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from typing import List
 import json
 import sympy as sp
@@ -22,31 +23,31 @@ axiom_colors = {
     5: "🟢", 6: "🟣", 7: "🟤", 8: "🟥", 9: "🟦", 10: "⬜"
 }
 
-def semantic_add(a: int, b: int) -> (int, str):
+def semantic_add(a: int, b: int) -> (int, str, int):
     total = a + b
     result = total % 11
     meaning = axioms.get(result, "Unknown")
-    return total, f"Axiom {result}: {axiom_colors[result]} {meaning}"
+    return total, f"Axiom {result}: {axiom_colors[result]} {meaning}", result
 
-def semantic_subtract(a: int, b: int) -> (int, str):
+def semantic_subtract(a: int, b: int) -> (int, str, int):
     difference = a - b
     result = difference % 11
     meaning = axioms.get(result, "Unknown")
-    return difference, f"Axiom {result}: {axiom_colors[result]} {meaning}"
+    return difference, f"Axiom {result}: {axiom_colors[result]} {meaning}", result
 
-def semantic_multiply(a: int, b: int) -> (int, str):
+def semantic_multiply(a: int, b: int) -> (int, str, int):
     product = a * b
     result = product % 11
     meaning = axioms.get(result, "Unknown")
-    return product, f"Axiom {result}: {axiom_colors[result]} {meaning}"
+    return product, f"Axiom {result}: {axiom_colors[result]} {meaning}", result
 
-def semantic_divide(a: int, b: int) -> (str, str):
+def semantic_divide(a: int, b: int) -> (str, str, int):
     if b == 0:
-        return "Undefined", "Division by zero is undefined."
+        return "Undefined", "Division by zero is undefined.", None
     quotient = a / b
     result = int(quotient) % 11
     meaning = axioms.get(result, "Unknown")
-    return f"{quotient:.2f}", f"Axiom {result}: {axiom_colors[result]} {meaning}"
+    return f"{quotient:.2f}", f"Axiom {result}: {axiom_colors[result]} {meaning}", result
 
 def compose_idea(path: List[int]) -> str:
     trace = []
@@ -84,39 +85,42 @@ with st.sidebar:
     for i in range(11):
         st.markdown(f"**{i}**: {axiom_colors[i]} {axioms[i]}")
 
+def axiom_reference_table():
+    table_data = {
+        "Axiom #": [i for i in range(11)],
+        "Symbol": [axiom_colors[i] for i in range(11)],
+        "Meaning": [axioms[i] for i in range(11)],
+    }
+    df = pd.DataFrame(table_data)
+    st.dataframe(df, use_container_width=True)
+
 st.header("🔢 Semantic Math Calculator")
 a = st.number_input("Enter first number (a):", value=2, step=1)
 b = st.number_input("Enter second number (b):", value=3, step=1)
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([2, 2])  # Output and Table side by side
 
-if st.button("➕ Add (Semantic)"):
-    value, meaning = semantic_add(a, b)
-    with col1:
+with col1:
+    if st.button("➕ Add (Semantic)"):
+        value, meaning, axiom_idx = semantic_add(a, b)
         st.success(f"Result: {value}")
-    with col2:
+        st.info(meaning)
+    if st.button("➖ Subtract (Semantic)"):
+        value, meaning, axiom_idx = semantic_subtract(a, b)
+        st.success(f"Result: {value}")
+        st.info(meaning)
+    if st.button("✖ Multiply (Semantic)"):
+        value, meaning, axiom_idx = semantic_multiply(a, b)
+        st.success(f"Result: {value}")
+        st.info(meaning)
+    if st.button("➗ Divide (Semantic)"):
+        value, meaning, axiom_idx = semantic_divide(a, b)
+        st.success(f"Result: {value}")
         st.info(meaning)
 
-if st.button("➖ Subtract (Semantic)"):
-    value, meaning = semantic_subtract(a, b)
-    with col1:
-        st.success(f"Result: {value}")
-    with col2:
-        st.info(meaning)
-
-if st.button("✖ Multiply (Semantic)"):
-    value, meaning = semantic_multiply(a, b)
-    with col1:
-        st.success(f"Result: {value}")
-    with col2:
-        st.info(meaning)
-
-if st.button("➗ Divide (Semantic)"):
-    value, meaning = semantic_divide(a, b)
-    with col1:
-        st.success(f"Result: {value}")
-    with col2:
-        st.info(meaning)
+with col2:
+    st.markdown("### Reference Table")
+    axiom_reference_table()
 
 st.markdown("---")
 st.header("📈 Semantic Calculus")
