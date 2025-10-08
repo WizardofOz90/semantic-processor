@@ -1,4 +1,3 @@
-
 import streamlit as st
 from typing import List
 import json
@@ -175,7 +174,7 @@ selected_template = st.selectbox("Choose a Template:", [
     "Feedback Loop → 2,4,6,10"
 ])
 
-if selected_template != "(None)"):
+if selected_template != "(None)":
     template_map = {
         "Big Bang → 0,1,2,3": [0,1,2,3],
         "Mind Emergence → 5,6,7,9": [5,6,7,9],
