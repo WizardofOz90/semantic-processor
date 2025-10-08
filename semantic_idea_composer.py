@@ -74,4 +74,111 @@ def semantic_integral(expr: str, var: str) -> str:
     except Exception as e:
         return f"Error computing integral: {e}"
 
-# rest of your code follows...
+# --- Streamlit UI ---
+st.set_page_config(page_title="Semantic Processor", layout="centered")
+st.title("🧠 Semantic Processor & Idea Composer")
+
+# Sidebar legend
+with st.sidebar:
+    st.subheader("🧬 Axiom Legend")
+    for i in range(11):
+        st.markdown(f"**{i}**: {axiom_colors[i]} {axioms[i]}")
+
+st.header("🔢 Semantic Math Calculator")
+a = st.number_input("Enter first number (a):", value=2, step=1)
+b = st.number_input("Enter second number (b):", value=3, step=1)
+
+col1, col2 = st.columns(2)
+
+if st.button("➕ Add (Semantic)"):
+    value, meaning = semantic_add(a, b)
+    with col1:
+        st.success(f"Result: {value}")
+    with col2:
+        st.info(meaning)
+
+if st.button("➖ Subtract (Semantic)"):
+    value, meaning = semantic_subtract(a, b)
+    with col1:
+        st.success(f"Result: {value}")
+    with col2:
+        st.info(meaning)
+
+if st.button("✖ Multiply (Semantic)"):
+    value, meaning = semantic_multiply(a, b)
+    with col1:
+        st.success(f"Result: {value}")
+    with col2:
+        st.info(meaning)
+
+if st.button("➗ Divide (Semantic)"):
+    value, meaning = semantic_divide(a, b)
+    with col1:
+        st.success(f"Result: {value}")
+    with col2:
+        st.info(meaning)
+
+st.markdown("---")
+st.header("📈 Semantic Calculus")
+expr_input = st.text_input("Enter a mathematical expression (e.g., x**2 + 3*x):")
+var_input = st.text_input("Differentiate or integrate with respect to (e.g., x):", value="x")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("🧮 Derivative"):
+        result = semantic_derivative(expr_input, var_input)
+        st.info(result)
+
+with col2:
+    if st.button("🔄 Integral"):
+        result = semantic_integral(expr_input, var_input)
+        st.info(result)
+
+with st.expander("ℹ️ How It Works"):
+    st.markdown("""
+    - Arithmetic operations use modulo 11 to wrap results into one of the 11 axioms.
+    - Calculus uses symbolic differentiation and integration for expressions with respect to a variable.
+    - This extends the semantic processor to continuous change.
+    """)
+
+st.markdown("---")
+st.header("🌌 Idea Composer")
+idea_input = st.text_input("Enter a sequence of numbers separated by commas (e.g. 0,1,2,3):")
+
+if st.button("🧬 Compose Idea"):
+    try:
+        path = [int(x.strip()) for x in idea_input.split(",") if x.strip().isdigit()]
+        result = compose_idea(path)
+        st.info(result)
+
+        # Export options
+        if st.button("💾 Export as JSON"):
+            json_data = json.dumps({"idea_sequence": path, "semantic_trace": result}, indent=2)
+            st.download_button("Download JSON", json_data, file_name="semantic_idea.json")
+
+        if st.button("📄 Export as Text"):
+            txt_data = result
+            st.download_button("Download Text", txt_data, file_name="semantic_idea.txt")
+
+    except Exception as e:
+        st.error(f"Error: {e}")
+
+# Preset Templates
+st.markdown("---")
+st.subheader("🧠 Try a Semantic Template")
+selected_template = st.selectbox("Choose a Template:", [
+    "(None)",
+    "Big Bang → 0,1,2,3",
+    "Mind Emergence → 5,6,7,9",
+    "Feedback Loop → 2,4,6,10"
+])
+
+if selected_template != "(None)":
+    template_map = {
+        "Big Bang → 0,1,2,3": [0,1,2,3],
+        "Mind Emergence → 5,6,7,9": [5,6,7,9],
+        "Feedback Loop → 2,4,6,10": [2,4,6,10]
+    }
+    path = template_map[selected_template]
+    st.info(compose_idea(path))
