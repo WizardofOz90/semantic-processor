@@ -22,6 +22,7 @@ axiom_colors = {
     5: "🟢", 6: "🟣", 7: "🟤", 8: "🟥", 9: "🟦", 10: "⬜"
 }
 
+# Prime number utilities
 def is_prime(n: int) -> bool:
     if n < 2:
         return False
@@ -48,6 +49,17 @@ def semantic_primes_trace(n: int) -> str:
     primes = generate_primes_up_to(n)
     trace = [f"{p}: {axiom_colors[p % 11]} {axioms[p % 11]}" for p in primes]
     return " → ".join(trace)
+
+def find_next_prime(n: int) -> int:
+    candidate = n + 1
+    while True:
+        if is_prime(candidate):
+            return candidate
+        candidate += 1
+
+def semantic_next_prime(n: int) -> str:
+    next_p = find_next_prime(n)
+    return f"Next prime after {n} is {next_p}: {axiom_colors[next_p % 11]} {axioms[next_p % 11]}"
 
 def semantic_add_prime_highlight(a: int, b: int) -> str:
     total = a + b
@@ -249,3 +261,9 @@ if st.button("Find Primes in Range"):
             st.markdown(f"- {p}: {axiom_colors[p % 11]} {axioms[p % 11]}")
     else:
         st.error("Maximum must be greater than or equal to minimum.")
+
+st.markdown("---")
+st.header("🔮 Find Next Prime Number")
+next_prime_input = st.number_input("Find next prime after:", value=7, step=1)
+if st.button("Find Next Prime"):
+    st.info(semantic_next_prime(next_prime_input))
